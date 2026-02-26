@@ -1,0 +1,19 @@
+# Build artifacts
+/target
+
+# Operator config (may contain RPC credentials, macaroon paths, secrets)
+config.toml
+config.*.toml
+
+# Lightning node credentials
+*.macaroon
+*.cert
+tls.cert
+tls.key
+
+# Environment files
+.env
+.env.*
+
+# macOS
+.DS_Store
