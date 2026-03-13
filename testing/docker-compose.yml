@@ -1,0 +1,68 @@
+services:
+  bitcoind:
+    image: polarlightning/bitcoind:28.0
+    container_name: fb-bitcoind
+    command: >
+      -regtest -server -txindex
+      -rpcuser=rpcuser -rpcpassword=rpcpass
+      -rpcallowip=0.0.0.0/0 -rpcbind=0.0.0.0
+      -zmqpubrawblock=tcp://0.0.0.0:28332
+      -zmqpubrawtx=tcp://0.0.0.0:28333
+      -fallbackfee=0.00001
+    ports:
+      - "18443:18443"
+      - "28332:28332"
+      - "28333:28333"
+    volumes:
+      - bitcoin_data:/home/bitcoin/.bitcoin
+
+  lnd-service:
+    image: polarlightning/lnd:0.18.4-beta
+    container_name: fb-lnd-service
+    depends_on: [bitcoind]
+    command: >
+      lnd
+      --noseedbackup
+      --bitcoin.active --bitcoin.regtest --bitcoin.node=bitcoind
+      --bitcoind.rpchost=bitcoind:18443
+      --bitcoind.rpcuser=rpcuser --bitcoind.rpcpass=rpcpass
+      --bitcoind.zmqpubrawblock=tcp://bitcoind:28332
+      --bitcoind.zmqpubrawtx=tcp://bitcoind:28333
+      --restlisten=0.0.0.0:8080
+      --rpclisten=0.0.0.0:10009
+      --listen=0.0.0.0:9735
+      --tlsextradomain=fb-lnd-service
+      --tlsextraip=0.0.0.0
+    ports:
+      - "8080:8080"
+      - "10009:10009"
+    volumes:
+      - lnd_service_data:/root/.lnd
+
+  lnd-user:
+    image: polarlightning/lnd:0.18.4-beta
+    container_name: fb-lnd-user
+    depends_on: [bitcoind]
+    command: >
+      lnd
+      --noseedbackup
+      --bitcoin.active --bitcoin.regtest --bitcoin.node=bitcoind
+      --bitcoind.rpchost=bitcoind:18443
+      --bitcoind.rpcuser=rpcuser --bitcoind.rpcpass=rpcpass
+      --bitcoind.zmqpubrawblock=tcp://bitcoind:28332
+      --bitcoind.zmqpubrawtx=tcp://bitcoind:28333
+      --restlisten=0.0.0.0:8080
+      --rpclisten=0.0.0.0:10009
+      --listen=0.0.0.0:9735
+      --tlsextradomain=fb-lnd-user
+      --tlsextraip=0.0.0.0
+    ports:
+      - "8081:8080"
+      - "10010:10009"
+    volumes:
+      - lnd_user_data:/root/.lnd
+
+volumes:
+  bitcoin_data:
+  lnd_service_data:
+  lnd_user_data:
