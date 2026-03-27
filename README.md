@@ -1,3 +1,7 @@
+**THIS IMPLEMENTATION IS A PROTOTYPE AND IS FULL OF BUGS. DO NOT USE IT IN PRODUCTION.**
+
+---
+
 # feebumper
 
 A transaction anchor fee-bumping service, payable via Lightning Network.
